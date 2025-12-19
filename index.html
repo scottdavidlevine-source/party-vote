@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Party Vote</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 500px;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  .song-info {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .song-title {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .song-artist {
+    font-size: 18px;
+    color: #555;
+  }
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    font-size: 18px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .upvote {
+    background: #4caf50;
+    color: white;
+  }
+  .downvote {
+    background: #f44336;
+    color: white;
+  }
+  .status {
+    margin-top: 15px;
+    text-align: center;
+    font-size: 16px;
+    color: #333;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="song-info">
+    <div class="song-title" id="song-title">Fetching song…</div>
+    <div class="song-artist" id="song-artist"></div>
+  </div>
+
+  <div class="buttons">
+    <button class="upvote" id="upvote-btn">👍 Upvote</button>
+    <button class="downvote" id="downvote-btn">👎 Downvote</button>
+  </div>
+
+  <div class="status" id="status-msg"></div>
+</div>
+
+<script>
+// Backend base URL
+const BASE_URL = ""; // leave blank if hosting frontend on same origin
+
+// Elements
+const titleEl = document.getElementById("song-title");
+const artistEl = document.getElementById("song-artist");
+const statusEl = document.getElementById("status-msg");
+
+let currentTrackId = null;
+
+// Fetch current song
+async function fetchCurrent() {
+  try {
+    const res = await fetch(`${BASE_URL}/current`);
+    const data = await res.json();
+
+    if (!data.spotify_track_id) {
+      titleEl.textContent = "No song playing";
+      artistEl.textContent = "";
+      currentTrackId = null;
+      return;
+    }
+
+    titleEl.textContent = data.track_name;
+    artistEl.textContent = data.artist;
+    currentTrackId = data.spotify_track_id;
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "Error fetching current song";
+  }
+}
+
+// Vote function
+async function sendVote(type) {
+  if (!currentTrackId) {
+    statusEl.textContent = "No song to vote on";
+    return;
+  }
+
+  try {
+    const res = await fetch(`${BASE_URL}/vote`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ device_id: "web", vote: type })
+    });
+    const result = await res.json();
+    if (result.success) {
+      statusEl.textContent = `Voted ${type}! 👍`;
+    } else {
+      statusEl.textContent = `Vote failed`;
+    }
+  } catch (err) {
+    console.error(err);
+    statusEl.textContent = "Error sending vote";
+  }
+}
+
+// Event listeners
+document.getElementById("upvote-btn").onclick = () => sendVote("up");
+document.getElementById("downvote-btn").onclick = () => sendVote("down");
+
+// Initial fetch + refresh periodically
+fetchCurrent();
+setInterval(fetchCurrent, 5000);
+</script>
+
+</body>
+</html>
