@@ -1,272 +1,111 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Party Vote 🎶</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Party Vote</title>
 
-  <style>
-    :root {
-      --bg: #0f1220;
-      --card: #1a1f3a;
-      --accent: #7c7cff;
-      --danger: #ff5c5c;
-      --success: #4ade80;
-      --text: #eaeaff;
-      --muted: #a1a1c2;
-    }
-
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-    }
-
-    body {
-      margin: 0;
-      background: linear-gradient(180deg, #0f1220, #090b17);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .app {
-      width: 100%;
-      max-width: 420px;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    }
-
-    .song-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 6px;
-      text-align: center;
-    }
-
-    .song-artist {
-      font-size: 16px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .votes-remaining {
-      margin-top: 12px;
-      text-align: center;
-      font-size: 15px;
-      color: var(--muted);
-    }
-
-    .buttons {
-      display: flex;
-      gap: 14px;
-      margin-top: 20px;
-    }
-
-    button {
-      flex: 1;
-      padding: 16px;
-      font-size: 18px;
-      border-radius: 14px;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.1s ease, opacity 0.1s ease;
-    }
-
-    button:active {
-      transform: scale(0.97);
-    }
-
-    .upvote {
-      background: var(--success);
-      color: #062e12;
-    }
-
-    .downvote {
-      background: var(--danger);
-      color: #330b0b;
-    }
-
-    .status {
-      text-align: center;
-      font-size: 14px;
-      margin-top: 10px;
-      color: var(--muted);
-    }
-
-    .analytics {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 10px;
-    }
-
-    .stat {
-      flex: 1;
-      background: rgba(255,255,255,0.05);
-      padding: 14px;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .stat-value {
-      font-size: 22px;
-      font-weight: 700;
-    }
-
-    .stat-label {
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 12px;
-      color: var(--muted);
-    }
-    .progress {
-  background: rgba(255,255,255,0.08);
-  border-radius: 999px;
-  height: 10px;
-  margin-top: 10px;
-  overflow: hidden;
+<style>
+body {
+  margin: 0;
+  background: #0f1220;
+  color: #fff;
+  font-family: system-ui;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
 }
-
-.progress-fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #ff5c5c, #ff9a5c);
-  transition: width 0.3s ease;
+.app { max-width: 420px; width: 100%; }
+.card {
+  background: #1a1f3a;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
 }
-
-  </style>
+h1, h3 { text-align: center; }
+.song { text-align: center; font-size: 22px; }
+.artist { color: #aaa; text-align: center; }
+.downvotes { text-align: center; color: #ff7a7a; font-size: 18px; }
+.progress { height: 10px; background: #333; border-radius: 10px; overflow: hidden; }
+.fill { height: 100%; background: #ff5c5c; width: 0%; }
+.buttons { display: flex; gap: 10px; margin-top: 12px; }
+button { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 18px; }
+.up { background: #4ade80; }
+.down { background: #ff5c5c; }
+.item { display: flex; justify-content: space-between; margin-top: 8px; }
+</style>
 </head>
 
 <body>
-  <div class="app">
-    <h1>🎉 Party Vote</h1>
+<div class="app">
+<h1>🎉 Party Vote</h1>
 
-    <!-- CURRENT SONG -->
-    <div class="card">
-      <div class="song-title" id="song-title">Loading…</div>
-      <div class="song-artist" id="song-artist"></div>
-
-      <div class="votes-remaining" id="votes-remaining"></div>
-<div class="progress">
-  <div class="progress-fill" id="skip-progress"></div>
+<div class="card">
+  <div class="song" id="song">Loading…</div>
+  <div class="artist" id="artist"></div>
+  <div class="downvotes" id="downvotes"></div>
+  <div class="progress"><div class="fill" id="fill"></div></div>
+  <div class="buttons">
+    <button class="up" onclick="vote('up')">👍</button>
+    <button class="down" onclick="vote('down')">👎</button>
+  </div>
 </div>
 
-      <div class="buttons">
-        <button class="upvote" onclick="vote('up')">👍 Upvote</button>
-        <button class="downvote" onclick="vote('down')">👎 Downvote</button>
-      </div>
+<div class="card">
+  <h3>💀 Most Downvoted</h3>
+  <div id="leaderboard"></div>
+</div>
+</div>
 
-      <div class="status" id="status"></div>
-    </div>
+<script>
+const BASE = "https://party-vote-backend.onrender.com";
+const THRESHOLD = 5;
 
-    <!-- ANALYTICS -->
-    <div class="card">
-      <h3 style="margin-top:0;">📊 Party Stats</h3>
-      <div class="analytics">
-        <div class="stat">
-          <div class="stat-value" id="total-songs">–</div>
-          <div class="stat-label">Songs Played</div>
-        </div>
-        <div class="stat">
-          <div class="stat-value" id="skip-rate">–%</div>
-          <div class="stat-label">Skip Rate</div>
-        </div>
-      </div>
-    </div>
+const device =
+  localStorage.device_id ||
+  (localStorage.device_id = crypto.randomUUID());
 
-    <footer>
-      Powered by the crowd 🕺💃
-    </footer>
-  </div>
+async function load() {
+  const r = await fetch(`${BASE}/current`);
+  const d = await r.json();
 
-  <script>
-    const BASE_URL = "https://party-vote-backend.onrender.com";
-    const deviceId =
-      localStorage.getItem("device_id") ||
-      (() => {
-        const id = crypto.randomUUID();
-        localStorage.setItem("device_id", id);
-        return id;
-      })();
+  if (!d.spotify_track_id) return;
 
-    async function loadCurrent() {
-      const res = await fetch(`${BASE_URL}/current`);
-      const data = await res.json();
+  song.textContent = d.track_name;
+  artist.textContent = d.artist;
+  downvotes.textContent = `👎 ${d.downvotes}`;
+  fill.style.width = `${(d.downvotes / THRESHOLD) * 100}%`;
+}
 
-      if (!data.spotify_track_id) {
-        document.getElementById("song-title").textContent = "No song playing";
-        document.getElementById("song-artist").textContent = "";
-        document.getElementById("votes-remaining").textContent = "";
-        return;
-      }
+async function vote(v) {
+  const r = await fetch(`${BASE}/vote`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ device_id: device, vote: v }),
+  });
+  const d = await r.json();
+  if (!r.ok) return;
+  downvotes.textContent = `👎 ${d.downvotes}`;
+  fill.style.width = `${((THRESHOLD - d.remaining) / THRESHOLD) * 100}%`;
+}
 
-      document.getElementById("song-title").textContent = data.track_name;
-      document.getElementById("song-artist").textContent = data.artist;
-    }
+async function loadLeaderboard() {
+  const r = await fetch(`${BASE}/analytics/most-downvoted`);
+  const d = await r.json();
+  leaderboard.innerHTML = "";
+  d.forEach((s, i) => {
+    leaderboard.innerHTML += `
+      <div class="item">
+        <span>${i + 1}. ${s.track_name}</span>
+        <strong>👎 ${s.total}</strong>
+      </div>`;
+  });
+}
 
-    async function vote(type) {
-      const status = document.getElementById("status");
-      status.textContent = "Sending vote…";
-
-      const res = await fetch(`${BASE_URL}/vote`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          device_id: deviceId,
-          vote: type
-        })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        status.textContent = data.error || "Vote failed";
-        return;
-      }
-
-      if (data.skipped) {
-        status.textContent = "⏭ Skipped by the crowd!";
-      } else {
-        status.textContent = "Vote counted 👍";
-        document.getElementById("votes-remaining").textContent =
-          `👎 ${data.remaining_to_skip} votes to skip`;
-      }
-    }
-
-    async function loadAnalytics() {
-      const res = await fetch(`${BASE_URL}/analytics`);
-      const data = await res.json();
-
-      document.getElementById("total-songs").textContent =
-        data.total_songs ?? "0";
-
-      document.getElementById("skip-rate").textContent =
-        `${data.skip_rate ?? 0}%`;
-    }
-
-    loadCurrent();
-    loadAnalytics();
-    setInterval(loadCurrent, 5000);
-    setInterval(loadAnalytics, 15000);
-  </script>
+load();
+loadLeaderboard();
+setInterval(load, 5000);
+setInterval(loadLeaderboard, 20000);
+</script>
 </body>
 </html>
